@@ -1,7 +1,7 @@
 [package]
 name = "ChatGPT"
-version = "1"
-description = "ChatGPT"
+version = "1.0.0"
+description = "ChatGPT By OphneAi"
 authors = ["1024xiaoshen"]
 edition = "2021"
 
