@@ -8,7 +8,10 @@ fn json_to_window_config(window_json: &str) -> Result<WindowConfig, Error> {
 }
 
 fn main() {
-    let edit_menu = Submenu::new(
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    let menu = Menu::new();
+    #[cfg(target_os = "macos")]
+    let menu = Menu::new().add_submenu(Submenu::new(
         "Edit",
         Menu::new()
             .add_native_item(MenuItem::Undo)
@@ -19,11 +22,11 @@ fn main() {
             .add_native_item(MenuItem::SelectAll)
             .add_native_item(MenuItem::CloseWindow)
             .add_native_item(MenuItem::Quit),
-    );
+    ));
     tauri::Builder::default()
         .setup(|app| {
             let app_handle = app.handle();
-            let window_json = r#"{"label":"ChatGPT","url":"https://chat.ophneai.com","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36","fileDropEnabled":true,"center":true,"width":800,"height":600,"minWidth":null,"minHeight":null,"maxWidth":null,"maxHeight":null,"resizable":true,"maximizable":true,"minimizable":true,"closable":true,"title":"ChatGPT","fullscreen":false,"focus":false,"transparent":false,"maximized":false,"visible":true,"decorations":true,"alwaysOnTop":false,"contentProtected":false,"skipTaskbar":false,"titleBarStyle":"Visible","hiddenTitle":false,"acceptFirstMouse":false,"tabbingIdentifier":"","additionalBrowserArgs":""}"#;
+            let window_json = r#"{"label":"ChatGPT","url":"https://chat.ophneai.com","userAgent":"Mozilla/5.0 (Linux; Android 14; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36","fileDropEnabled":true,"center":true,"width":8,"height":915,"minWidth":null,"minHeight":null,"maxWidth":null,"maxHeight":null,"resizable":true,"maximizable":true,"minimizable":true,"closable":true,"title":"ChatGPT","fullscreen":false,"focus":false,"transparent":false,"maximized":false,"visible":true,"decorations":true,"alwaysOnTop":false,"contentProtected":false,"skipTaskbar":false,"titleBarStyle":"Visible","hiddenTitle":false,"acceptFirstMouse":false,"tabbingIdentifier":"","additionalBrowserArgs":""}"#;
             match json_to_window_config(window_json) {
                 Ok(config) => {
                     println!("Parsed WindowConfig: {:?}", config);
@@ -37,7 +40,7 @@ fn main() {
             }
             Ok(())
         })
-        .menu(Menu::new().add_submenu(edit_menu))
+        .menu(menu)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
